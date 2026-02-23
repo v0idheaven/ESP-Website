@@ -34,11 +34,14 @@ class FormstackAppSettings(models.Model):
     coreclass_fields = models.CharField(max_length=80, blank=True, help_text="A list of field ids separated by commas.", validators=[validate_comma_separated_integer_list])
 
     autopopulated_fields = models.TextField(blank=True, help_text="""\
-To autopopulate fields on the form, type "[field id]: [Python
-expression that returns field value]", one field per line. The Python
-expression can use the variable 'user' to refer to request.user.
+To autopopulate fields on the form, type "[field id]: [template expression]",
+one field per line. The expression uses Django template syntax and can access
+the 'user' variable (e.g., 'user.username', 'user.email', 'user.first_name').
 
-Caution: expressions will be eval()'d by the server.""")
+Examples:
+  12345: user.username
+  67890: user.first_name|add:" "|add:user.last_name
+  11111: user.email""")
 
     finaid_user_id_field = models.IntegerField(null=True, blank=True)
     finaid_username_field = models.IntegerField(null=True, blank=True)

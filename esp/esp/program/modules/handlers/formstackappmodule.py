@@ -38,6 +38,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.db.models.query import Q
+from django.template import Template, Context
 from esp.program.modules.base import ProgramModuleObj, needs_student_in_grade, main_call, aux_call
 from esp.utils.web import render_to_response
 from esp.users.models    import ESPUser
@@ -88,11 +89,22 @@ class FormstackAppModule(ProgramModuleObj):
         context['app_is_open'] = fsas.app_is_open or request.user.isAdmin(prog)
         context['autopopulated'] = autopopulated = []
         for line in fsas.autopopulated_fields.strip().split('\n'):
+            if not line.strip():
+                continue
             field, _, expr = line.partition(':')
+            field = field.strip()
+            expr = expr.strip()
+            if not field or not expr:
+                continue
             try:
-                value = eval(expr, {'user': request.user})
+                # Use Django's template system for safer evaluation
+                # Wrap expression in {{ }} if not already present
+                if not (expr.startswith('{{') and expr.endswith('}}')):
+                    expr = '{{ ' + expr + ' }}'
+                template = Template(expr)
+                value = template.render(Context({'user': request.user}))
             except Exception as e:
-                logger.exception("Error in FormstackAppSettings: %s", e)
+                logger.exception("Error evaluating autopopulated field '%s': %s", field, e)
                 continue
             autopopulated.append((field, value))
         return render_to_response(self.baseDir()+'studentapp.html',
