@@ -12,6 +12,13 @@ class FormstackAppModuleTest(ProgramFrameworkTest):
         result = resolve_field_expression('user.username', context)
         self.assertEqual(result, user.username)
 
+    def test_resolve_leading_whitespace_expression(self):
+        """Expressions with leading/trailing whitespace resolve correctly."""
+        user = self.students[0]
+        context = {'user': user}
+        result = resolve_field_expression(' user.username', context)
+        self.assertEqual(result, user.username)
+
     def test_resolve_invalid_expression(self):
         """Invalid expressions return None instead of raising."""
         user = self.students[0]
@@ -30,6 +37,12 @@ class FormstackAppModuleTest(ProgramFrameworkTest):
     def test_resolve_whitespace_expression(self):
         """Whitespace-only expressions return None."""
         result = resolve_field_expression('   ', {'user': self.students[0]})
+        self.assertIsNone(result)
+
+    def test_resolve_none_value(self):
+        """Expressions resolving to None return None, not the string 'None'."""
+        context = {'user': None}
+        result = resolve_field_expression('user', context)
         self.assertIsNone(result)
 
     def test_resolve_empty_string_value(self):

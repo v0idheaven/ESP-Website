@@ -35,7 +35,7 @@ Learning Unlimited, Inc.
 
 import logging
 
-from django.db.models.query import Q  # noqa
+from django.db.models.query import Q
 from django.template import Variable, Context, VariableDoesNotExist
 
 from esp.application.models import FormstackStudentProgramApp
@@ -51,13 +51,15 @@ logger = logging.getLogger(__name__)
 def resolve_field_expression(expression, context_vars):
     if not expression or not expression.strip():
         return None
+    expression = expression.strip()
     try:
-        return str(Variable(expression).resolve(Context(context_vars)))
-    except VariableDoesNotExist:
-        return None
-    except Exception as e:
-        logger.exception(
-            "Error resolving field expression '%s': %s", expression, e
+        resolved = Variable(expression).resolve(Context(context_vars))
+        if resolved is None:
+            return None
+        return str(resolved)
+    except (VariableDoesNotExist, Exception) as e:
+        logger.warning(
+            "Failed to resolve field expression '%s': %s", expression, e
         )
         return None
 
@@ -115,8 +117,9 @@ class FormstackAppModule(ProgramModuleObj):
                 continue
             field, _, expr = line.partition(':')
             value = resolve_field_expression(expr, {'user': request.user})
-            if value is not None:
-                autopopulated.append((field.strip(), value))
+            field_name = field.strip()
+            if value is not None and field_name:
+                autopopulated.append((field_name, value))
         return render_to_response(self.baseDir()+'studentapp.html',
                                   request, context)
 
