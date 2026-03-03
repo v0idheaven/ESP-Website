@@ -117,7 +117,7 @@ DATABASES = {'default':
 # Default email settings #
 ##########################
 EMAIL_HOST   = 'localhost'
-EMAIL_PORT   = 25
+EMAIL_PORT   = '25'
 SERVER_EMAIL = 'server@{}'.format(os.uname()[1])
 EMAIL_SUBJECT_PREFIX = '[ ESP ERROR ] '
 EMAIL_HOST_SENDER = EMAIL_HOST
