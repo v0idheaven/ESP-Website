@@ -35,8 +35,9 @@ Learning Unlimited, Inc.
 
 import logging
 
-from django.db.models.query import Q  # noqa
-from django.template import Variable, Context, VariableDoesNotExist
+from django.db.models.query import Q
+from django.template import Variable, Context
+from django.template.base import VariableDoesNotExist
 
 from esp.application.models import FormstackStudentProgramApp
 from esp.program.modules.base import (
@@ -49,16 +50,21 @@ logger = logging.getLogger(__name__)
 
 
 def resolve_field_expression(expression, context_vars):
+    """Safely resolve a Django template variable expression.
+
+    Returns the string value of the resolved expression, or None if the
+    expression is empty, resolves to None, or cannot be resolved.
+    """
     if not expression or not expression.strip():
         return None
+    expression = expression.strip()
     try:
-        return str(Variable(expression).resolve(Context(context_vars)))
-    except VariableDoesNotExist:
-        return None
-    except Exception as e:
-        logger.exception(
-            "Error resolving field expression '%s': %s", expression, e
-        )
+        resolved = Variable(expression).resolve(Context(context_vars))
+        if resolved is None:
+            return None
+        return str(resolved)
+    except Exception:
+        logger.warning("Failed to resolve autopopulated field expression: %s", expression)
         return None
 
 
@@ -107,16 +113,14 @@ class FormstackAppModule(ProgramModuleObj):
         context['form'] = fsas.form()
         context['username_field'] = fsas.username_field
         context['username'] = request.user.username
-        app_is_open = fsas.app_is_open or request.user.isAdmin(prog)
-        context['app_is_open'] = app_is_open
+        context['app_is_open'] = fsas.app_is_open or request.user.isAdmin(prog)
         context['autopopulated'] = autopopulated = []
         for line in fsas.autopopulated_fields.strip().split('\n'):
-            if not line.strip():
-                continue
             field, _, expr = line.partition(':')
             value = resolve_field_expression(expr, {'user': request.user})
-            if value is not None:
-                autopopulated.append((field.strip(), value))
+            field_name = field.strip()
+            if value is not None and field_name:
+                autopopulated.append((field_name, value))
         return render_to_response(self.baseDir()+'studentapp.html',
                                   request, context)
 
