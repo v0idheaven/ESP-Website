@@ -59,6 +59,22 @@
 }
 </style>
 <![endif]-->
+<style>
+.skip-nav {
+    position: absolute;
+    top: -40px;
+    left: 10px;
+    background: #000;
+    color: #fff;
+    padding: 6px 10px;
+    z-index: 1000;
+    text-decoration: none;
+}
+.skip-nav:focus,
+.skip-nav:focus-visible {
+    top: 10px;
+}
+</style>
 {% endblock %}
 
 {% block javascript %}
@@ -72,6 +88,7 @@
 {% endblock %}
 
 {% block body %}
+<a href="#main-content" class="skip-nav">Skip to main content</a>
 <link rel="stylesheet" type="text/css" href="/media/default_styles/admin_bar.css">
 <div id="adminbar" class="admin hidden" style="position: fixed !important">
   <div class="title" onclick="ESP.toggleDisplay('adminbar_content');">Admin Toolbar</div>
@@ -230,6 +247,7 @@ var debug = {{ settings.DEBUG|yesno:"true,false" }};
 {% navbar_gen request.path None navbar_list %}
 {% endblock %}
 
+      <main id="main-content" tabindex="-1">
       <div id="content">
           {% if request.mod_required %}
           <div class="alert alert-danger">
@@ -263,7 +281,7 @@ var debug = {{ settings.DEBUG|yesno:"true,false" }};
       </div>
       {% endif %}
       {% endwith %}
-    </div>
+    </main>
     <div id="footer">
 	  {% if theme.show_footer_textbox %}
 		<div>

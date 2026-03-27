@@ -10,9 +10,27 @@
     background-image: url(/media/images/theme/header.png?v={{ current_header_version }});
 }
 </style>
+<style>
+.skip-nav {
+    position: absolute;
+    top: -40px;
+    left: 10px;
+    background: #000;
+    color: #fff;
+    padding: 6px 10px;
+    z-index: 1000;
+    text-decoration: none;
+}
+.skip-nav:focus,
+.skip-nav:focus-visible {
+    top: 10px;
+}
+</style>
 {% endblock stylesheets %}
 
 {% block body %}
+
+<a href="#main-content" class="skip-nav">Skip to main content</a>
 
 {% comment %}
 {% block navbar %}{% include "navbar.html" %}{% endblock navbar%}
@@ -79,6 +97,7 @@
 <div class="container">
   <div class="row">
     {% block sidebar %}
+    <aside aria-label="Sidebar">
     <div id="sidebar" class="span3">
       {% include "sidebar/nav.html" %}
       {% include "sidebar/admin.html" %}
@@ -106,9 +125,10 @@
       </ul>
       {% endif %}
     </div>
+    </aside>
     {% endblock %}
 
-    <div id="main" class="span9 resizable">
+    <main id="main-content" class="span9 resizable" tabindex="-1">
       {% if request.mod_required %}
       <div class="alert alert-danger">
           <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
@@ -141,7 +161,7 @@
 		<a>&copy; {{ theme.full_group_name }}, {{ theme.mtime.year }}</a>
 		<a href="https://www.learningu.org/about/privacy/" target="_blank">Privacy Policy</a>
 	  </div>
-    </div>
+    </main>
   </div>
 </div>
 </div>

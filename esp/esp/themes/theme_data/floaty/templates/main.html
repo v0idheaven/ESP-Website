@@ -7,7 +7,29 @@
     <script type="text/javascript" src="/media/scripts/theme/main.js"></script>
 {% endblock %}
 
+{% block stylesheets %}
+{{ block.super }}
+<style>
+.skip-nav {
+    position: absolute;
+    top: -40px;
+    left: 10px;
+    background: #000;
+    color: #fff;
+    padding: 6px 10px;
+    z-index: 1000;
+    text-decoration: none;
+}
+.skip-nav:focus,
+.skip-nav:focus-visible {
+    top: 10px;
+}
+</style>
+{% endblock %}
+
 {% block body %}
+
+<a href="#main-content" class="skip-nav">Skip to main content</a>
 
 {% block main %}
 <div id="page" style="margin:0 auto; width:920px;">
@@ -116,6 +138,7 @@
 
 </div>
 
+<main id="main-content" tabindex="-1">
 <div id="content_area">
     {% if request.mod_required %}
     <div class="alert alert-danger">
@@ -169,6 +192,7 @@
         {% endif %}
     </div>
 </div>
+</main>
 
 </div>
 </div>

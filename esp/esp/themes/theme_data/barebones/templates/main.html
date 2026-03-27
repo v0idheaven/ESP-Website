@@ -13,6 +13,22 @@ Customize your title formatting here.  For example:
     Example stylesheet inclusion tag:
     <link rel="stylesheet" href="/media/styles/main.css" type="text/css" />
     {% endcomment %}
+    <style>
+    .skip-nav {
+        position: absolute;
+        top: -40px;
+        left: 10px;
+        background: #000;
+        color: #fff;
+        padding: 6px 10px;
+        z-index: 1000;
+        text-decoration: none;
+    }
+    .skip-nav:focus,
+    .skip-nav:focus-visible {
+        top: 10px;
+    }
+    </style>
 {% endblock %}
 
 {% block javascript %}
@@ -23,6 +39,8 @@ Customize your title formatting here.  For example:
 
 {% block body %}
 
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+
 {% block navbar %}
 {% include "navbar.html" %}
 {% endblock navbar%}
@@ -32,6 +50,7 @@ Customize your title formatting here.  For example:
 <div class="container">
   <div class="row">
     {% block sidebar %}
+    <aside aria-label="Sidebar">
     <div class="hidden" id="sidebar">
       <ul class="nav nav-list sidebar">
 	{% include "sidebar/me.html" %}
@@ -66,9 +85,10 @@ Customize your title formatting here.  For example:
       </ul>
       {% endif %}
     </div>
+    </aside>
     {% endblock %}
 
-    <div id="main" class="span12 resizable">
+    <main id="main-content" class="span12 resizable" tabindex="-1">
       {% if request.mod_required %}
       <div class="alert alert-danger">
           <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
@@ -89,7 +109,7 @@ Customize your title formatting here.  For example:
       {% endif %}
       {% block content %}
       {% endblock %}
-    </div>
+    </main>
   </div>
 </div>
 </div>
